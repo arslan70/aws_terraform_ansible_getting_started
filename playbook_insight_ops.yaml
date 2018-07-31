@@ -1,0 +1,45 @@
+- hosts: tag_Service*
+  become: yes
+  gather_facts: no
+  roles:
+    - common
+  vars_prompt:
+    - name: service
+      prompt: "Enter Service Name"
+      private: no
+  tasks:
+    - name: Copy InsightOps Installation Script
+      copy:
+        src: files/Linux_Insight_Agent.zip
+        dest: /tmp
+      when: ec2_tag_Service == service
+    
+    - name: Extract InsightOps Installation Script
+      unarchive:
+        src: /tmp/Linux_Insight_Agent.zip
+        dest: /tmp/
+        remote_src: yes
+      when: ec2_tag_Service == service
+    
+    - name: Make install script executable
+      shell: chmod a+x /tmp/agent_installer.sh
+      when: ec2_tag_Service == service
+    
+    - name: Execute InsightOps Installation Script
+      command: /tmp/agent_installer.sh install_start
+      ignore_errors: yes
+      when: ec2_tag_Service == service
+    
+    - name: Ensures conf dir exists
+      file: path=/opt/rapid7/ir_agent/config/ state=directory
+      when: ec2_tag_Service == service
+
+    - name: Copy InsightOps Configuration Files
+      template: src=templates/logging_{{service}}.j2 dest=/opt/rapid7/ir_agent/config/logging.json
+      when: ec2_tag_Service == service
+    
+    - name: Restart InsightOps Service
+      service:
+        name: ir_agent 
+        state: restarted
+      when: ec2_tag_Service == service

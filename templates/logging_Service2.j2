@@ -1,0 +1,44 @@
+{
+    "config": {
+      "name": "{{ ansible_host }}",
+      "endpoint": "eu.data.logs.insight.rapid7.com",
+      "region": "eu",
+      "api-key": "{{api_key}}",
+      "metrics": {
+        "system-stat-token": "{{ system_stat_token }}",
+        "system-stat-enabled": true,
+        "metrics-interval": "60s",
+        "metrics-cpu": "system",
+        "metrics-vcpu": "core",
+        "metrics-mem": "system",
+        "metrics-swap": "system",
+        "metrics-net": "sum eth0",
+        "metrics-disk": "sum sda4 sda5",
+        "metrics-space": "/"
+      },
+      "logs": [{
+        "name": "System log",
+        "destination": "{{ ansible_host }}{{ service }}/syslog",
+        "path": "/var/log/syslog",
+        "enabled": true
+      },
+      {
+        "name": "Kernel",
+        "destination": "{{ ansible_host }}{{ service }}/kernel",
+         "path": "/var/log/kern.log",
+         "enabled": true
+      },
+      {
+        "name": "Authentication",
+        "destination": "{{ ansible_host }}{{ service }}/auth",
+        "path": "/var/log/auth.log",
+        "enabled": true
+      },
+      {
+        "name": "Insight Agent log",
+        "destination": "{{ ansible_host }}{{ service }}/agent",
+        "path": "/opt/rapid7/ir_agent/agent.log",
+        "enabled": true
+      }]
+    }
+  }
